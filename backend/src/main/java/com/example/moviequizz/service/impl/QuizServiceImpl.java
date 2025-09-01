@@ -58,7 +58,7 @@ public class QuizServiceImpl implements QuizService {
 
         Collections.shuffle(options);
 
-        String questionText = "Who directed the movie \"" + title + "\"?";
+        String questionText = "Who directed the movie " + title + " ?";
         String token = jwtUtil.generateQuestionToken(imdbID, correctDirector, 10 * 60 * 1000); // 10 min
 
         return new QuestionDTO(questionText, options, token);
