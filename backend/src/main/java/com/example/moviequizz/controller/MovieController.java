@@ -35,9 +35,7 @@ public class MovieController {
     public String importTopMovies() {
         try {
             InputStream inputStream = getClass().getResourceAsStream("/top250_min.json");
-            if (inputStream == null) {
-                throw new IllegalArgumentException("File not found in classpath!");
-            }
+            if (inputStream == null) throw new IllegalArgumentException("File not found!");
 
             List<ImdbMovieJsonDTO> movieList = objectMapper.readValue(
                     inputStream,
@@ -50,14 +48,15 @@ public class MovieController {
                 if (movieRepository.existsByImdbId(imdbId)) continue;
 
                 Map<String, Object> omdbData = omdbService.getMovieByImdbId(imdbId);
-                if (omdbData == null || omdbData.get("Title") == null || omdbData.get("Director") == null) continue;
+                if (omdbData == null || omdbData.get("Title") == null || omdbData.get("Director") == null)
+                    continue;
 
                 Movie movie = Movie.builder()
                         .imdbId(imdbId)
                         .title((String) omdbData.get("Title"))
-                        .directors(omdbData.get("Director") != null ? List.of(((String) omdbData.get("Director")).split(",\\s*")) : new ArrayList<>())
-                        .actors(omdbData.get("Actors") != null ? List.of(((String) omdbData.get("Actors")).split(",\\s*")) : new ArrayList<>())
-                        .genres(omdbData.get("Genre") != null ? List.of(((String) omdbData.get("Genre")).split(",\\s*")) : new ArrayList<>())
+                        .directorsCsv(safeString(omdbData.get("Director")))
+                        .actorsCsv(safeString(omdbData.get("Actors")))
+                        .genresCsv(safeString(omdbData.get("Genre")))
                         .year(omdbData.get("Year") != null ? Integer.parseInt((String) omdbData.get("Year")) : null)
                         .rating(omdbData.get("imdbRating") != null ? Double.parseDouble((String) omdbData.get("imdbRating")) : null)
                         .description((String) omdbData.get("Plot"))
@@ -76,5 +75,14 @@ public class MovieController {
             return "Error importing movies: " + e.getMessage();
         }
     }
+
+    /** Helper method: safely convert OMDB field to string */
+    private String safeString(Object field) {
+        if (field == null) return "";
+        String s = ((String) field).trim();
+        return (s.isBlank() || s.equalsIgnoreCase("N/A")) ? "" : s;
+    }
+
+
 }
 

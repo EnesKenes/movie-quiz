@@ -1,5 +1,6 @@
 package com.example.moviequizz.util;
 
+import com.example.moviequizz.dto.QuestionType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,11 +20,12 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(base64Secret.getBytes());
     }
 
-    // Generate a token containing only the question ID
-    public String generateQuestionToken(String questionId, long expirationMs) {
+    // Generate token with questionId and type
+    public String generateQuestionToken(String questionId, QuestionType type, long expirationMs) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
-                .setSubject(questionId) // question ID only
+                .setSubject(questionId)
+                .claim("questionType", type.name())
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -35,12 +37,13 @@ public class JwtUtil {
         return extractAllClaims(token).getSubject();
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    // Extract question type from token
+    public QuestionType extractQuestionType(String token) {
+        String typeStr = extractAllClaims(token).get("questionType", String.class);
+        if (typeStr == null) {
+            throw new IllegalArgumentException("Token does not contain a question type");
+        }
+        return QuestionType.valueOf(typeStr);
     }
 
     // Check if token expired
@@ -48,4 +51,13 @@ public class JwtUtil {
         Date expiration = extractAllClaims(token).getExpiration();
         return expiration.before(new Date());
     }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 }
+

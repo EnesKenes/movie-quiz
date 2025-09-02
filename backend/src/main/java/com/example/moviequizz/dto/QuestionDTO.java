@@ -12,6 +12,7 @@ public class QuestionDTO {
 
     private String questionText;
     private List<String> options;
-    private String token; // JWT containing the correct answer
+    private String token; // JWT containing the IMDB ID
+    private QuestionType type;
 
 }

@@ -24,20 +24,14 @@ public class Movie {
     @Column(nullable = false)
     private String title;
 
-    @ElementCollection
-    @CollectionTable(name = "movie_directors", joinColumns = @JoinColumn(name = "movie_id"))
-    @Column(name = "director")
-    private List<String> directors = new ArrayList<>();
+    @Column(length = 1000)
+    private String directorsCsv;
 
-    @ElementCollection
-    @CollectionTable(name = "movie_actors", joinColumns = @JoinColumn(name = "movie_id"))
-    @Column(name = "actor")
-    private List<String> actors = new ArrayList<>();
+    @Column(length = 1000)
+    private String actorsCsv;
 
-    @ElementCollection
-    @CollectionTable(name = "movie_genres", joinColumns = @JoinColumn(name = "movie_id"))
-    @Column(name = "genre")
-    private List<String> genres = new ArrayList<>();
+    @Column(length = 1000)
+    private String genresCsv;
 
     private Integer year;
 
