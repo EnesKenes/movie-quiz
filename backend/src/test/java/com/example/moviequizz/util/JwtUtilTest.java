@@ -2,17 +2,16 @@ package com.example.moviequizz.util;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class JwtUtilTest {
 
-    private JwtUtil jwtUtil;
-
-    @BeforeEach
-    public void setup() {
-        String secret = "replace_this_with_a_very_long_secret_key_for_jwt_purposes";
-        jwtUtil = new JwtUtil(secret);
-    }
+    @Autowired
+    private JwtUtil jwtUtil;  // Spring injects the singleton
 
     @Test
     public void testGenerateAndValidateToken() {

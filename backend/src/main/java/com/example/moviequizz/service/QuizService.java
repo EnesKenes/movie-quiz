@@ -4,6 +4,6 @@ import com.example.moviequizz.dto.QuestionDTO;
 
 public interface QuizService {
 
-    QuestionDTO generateDirectorQuestion();
+    QuestionDTO generateQuestion();
 
 }

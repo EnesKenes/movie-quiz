@@ -27,7 +27,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public QuestionDTO generateDirectorQuestion() {
+    public QuestionDTO generateQuestion() {
         List<Movie> movies = movieRepository.findAll();
         if (movies.isEmpty()) return null;
 
