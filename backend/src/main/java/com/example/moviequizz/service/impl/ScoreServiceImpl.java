@@ -33,9 +33,10 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public List<ScoreDTO> getTopScores(int limit) {
-        return scoreRepository.findTopNByOrderByScoreDesc(PageRequest.of(0, limit))
+        return scoreRepository.findAllByOrderByScoreDesc(PageRequest.of(0, limit))
                 .stream()
                 .map(scoreMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
 }

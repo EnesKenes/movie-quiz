@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface ScoreRepository extends JpaRepository<Score,Long> {
 
-    List<Score> findTopNByOrderByScoreDesc(Pageable pageable);
+    List<Score> findAllByOrderByScoreDesc(Pageable pageable);
 
 }
