@@ -18,5 +18,4 @@ public class AnswerResultDTO {
 
     @Schema(description = "Next question to answer if the previous one was correct; null otherwise")
     private QuestionDTO nextQuestion;
-
 }

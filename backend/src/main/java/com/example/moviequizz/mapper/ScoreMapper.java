@@ -10,5 +10,4 @@ public interface ScoreMapper {
     ScoreDTO toDTO(Score score);
 
     Score toEntity(ScoreDTO scoreDTO);
-
 }

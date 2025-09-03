@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Answer submitted by the player")
 public class AnswerDTO {
 
-
     @Schema(description = "The answer selected by the player", example = "Christopher Nolan")
     private String selectedAnswer;
 
-    @Schema(description = "The token identifying the question (usually a JWT containing the IMDb ID)",
+    @Schema(
+            description =
+                    "The token identifying the question (usually a JWT containing the IMDb ID)",
             example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0dDAwMTIzNDUifQ.sometokenvalue")
     private String token;
-
 }

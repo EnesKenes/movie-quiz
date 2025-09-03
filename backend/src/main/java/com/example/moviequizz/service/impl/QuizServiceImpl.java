@@ -8,10 +8,9 @@ import com.example.moviequizz.entity.Movie;
 import com.example.moviequizz.repository.MovieRepository;
 import com.example.moviequizz.service.QuizService;
 import com.example.moviequizz.util.JwtUtil;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 public class QuizServiceImpl implements QuizService {
@@ -89,7 +88,8 @@ public class QuizServiceImpl implements QuizService {
         return values[random.nextInt(values.length)];
     }
 
-    private List<String> generateRandomOptions(String correctAnswer, QuestionType type, List<Movie> movies, Movie correctMovie) {
+    private List<String> generateRandomOptions(
+            String correctAnswer, QuestionType type, List<Movie> movies, Movie correctMovie) {
         Set<String> wrongOptions = new HashSet<>();
         Set<String> excluded = new HashSet<>();
 
@@ -144,18 +144,12 @@ public class QuizServiceImpl implements QuizService {
         String questionId = jwtUtil.extractQuestionId(answerDTO.getToken());
 
         if (jwtUtil.isTokenExpired(answerDTO.getToken())) {
-            return AnswerResultDTO.builder()
-                    .correct(false)
-                    .nextQuestion(null)
-                    .build();
+            return AnswerResultDTO.builder().correct(false).nextQuestion(null).build();
         }
 
         Optional<Movie> movieOpt = movieRepository.findByImdbId(questionId);
         if (movieOpt.isEmpty()) {
-            return AnswerResultDTO.builder()
-                    .correct(false)
-                    .nextQuestion(null)
-                    .build();
+            return AnswerResultDTO.builder().correct(false).nextQuestion(null).build();
         }
 
         Movie movie = movieOpt.get();
@@ -174,28 +168,20 @@ public class QuizServiceImpl implements QuizService {
                 correct = containsCsvValue(movie.getGenresCsv(), answerDTO.getSelectedAnswer());
                 break;
             case YEAR:
-                correct = String.valueOf(movie.getYear())
-                        .equalsIgnoreCase(answerDTO.getSelectedAnswer().trim());
+                correct =
+                        String.valueOf(movie.getYear())
+                                .equalsIgnoreCase(answerDTO.getSelectedAnswer().trim());
                 break;
             default:
-                return AnswerResultDTO.builder()
-                        .correct(false)
-                        .nextQuestion(null)
-                        .build();
+                return AnswerResultDTO.builder().correct(false).nextQuestion(null).build();
         }
 
         if (!correct) {
-            return AnswerResultDTO.builder()
-                    .correct(false)
-                    .nextQuestion(null)
-                    .build();
+            return AnswerResultDTO.builder().correct(false).nextQuestion(null).build();
         }
 
         QuestionDTO nextQuestion = generateQuestion();
-        return AnswerResultDTO.builder()
-                .correct(true)
-                .nextQuestion(nextQuestion)
-                .build();
+        return AnswerResultDTO.builder().correct(true).nextQuestion(nextQuestion).build();
     }
 
     /**
@@ -210,5 +196,4 @@ public class QuizServiceImpl implements QuizService {
         }
         return false;
     }
-
 }

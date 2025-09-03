@@ -5,12 +5,11 @@ import com.example.moviequizz.entity.Score;
 import com.example.moviequizz.mapper.ScoreMapper;
 import com.example.moviequizz.repository.ScoreRepository;
 import com.example.moviequizz.service.ScoreService;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
@@ -33,10 +32,8 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public List<ScoreDTO> getTopScores(int limit) {
-        return scoreRepository.findAllByOrderByScoreDesc(PageRequest.of(0, limit))
-                .stream()
+        return scoreRepository.findAllByOrderByScoreDesc(PageRequest.of(0, limit)).stream()
                 .map(scoreMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
 }

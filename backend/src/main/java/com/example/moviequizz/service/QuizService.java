@@ -12,5 +12,4 @@ public interface QuizService {
     QuestionDTO generateQuestion(QuestionType type);
 
     AnswerResultDTO submitAnswer(AnswerDTO answerDTO);
-
 }

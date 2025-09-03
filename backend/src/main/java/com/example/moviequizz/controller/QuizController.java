@@ -27,16 +27,15 @@ public class QuizController {
 
     @Operation(
             summary = "Get a quiz question",
-            description = "Generates and returns a random quiz question. "
-                    + "The type of the question (actor, director, genre, or year) is chosen automatically.",
+            description =
+                    "Generates and returns a random quiz question. The type of the question (actor,"
+                            + " director, genre, or year) is chosen automatically.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "A new question has been generated",
-                            content = @Content(schema = @Schema(implementation = QuestionDTO.class))
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "A new question has been generated",
+                        content = @Content(schema = @Schema(implementation = QuestionDTO.class)))
+            })
     @GetMapping("/question")
     public QuestionDTO getQuestion() {
         return quizService.generateQuestion();
@@ -44,21 +43,21 @@ public class QuizController {
 
     @Operation(
             summary = "Submit an answer",
-            description = "Submits an answer for validation. "
-                    + "Returns whether the answer was correct and, if so, also provides the next question.",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "The selected answer and its associated token",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = AnswerDTO.class))
-            ),
+            description =
+                    "Submits an answer for validation. Returns whether the answer was correct and,"
+                            + " if so, also provides the next question.",
+            requestBody =
+                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                            description = "The selected answer and its associated token",
+                            required = true,
+                            content = @Content(schema = @Schema(implementation = AnswerDTO.class))),
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Answer evaluated successfully",
-                            content = @Content(schema = @Schema(implementation = AnswerResultDTO.class))
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Answer evaluated successfully",
+                        content =
+                                @Content(schema = @Schema(implementation = AnswerResultDTO.class)))
+            })
     @PostMapping("/answer")
     public ResponseEntity<AnswerResultDTO> submitAnswer(@RequestBody AnswerDTO answerDTO) {
         AnswerResultDTO result = quizService.submitAnswer(answerDTO);

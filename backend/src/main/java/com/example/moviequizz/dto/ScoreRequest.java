@@ -11,5 +11,4 @@ public class ScoreRequest {
 
     private String username;
     private int score;
-
 }

@@ -8,10 +8,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Score API", description = "Endpoints for submitting and retrieving player scores")
 @RestController
@@ -27,21 +26,20 @@ public class ScoreController {
 
     @Operation(
             summary = "Submit a score",
-            description = "Submits a player's score after completing a quiz round. "
-                    + "The score is persisted in the database.",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Score object containing username and score value",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = ScoreDTO.class))
-            ),
+            description =
+                    "Submits a player's score after completing a quiz round. "
+                            + "The score is persisted in the database.",
+            requestBody =
+                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                            description = "Score object containing username and score value",
+                            required = true,
+                            content = @Content(schema = @Schema(implementation = ScoreDTO.class))),
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Score saved successfully",
-                            content = @Content(schema = @Schema(implementation = ScoreDTO.class))
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Score saved successfully",
+                        content = @Content(schema = @Schema(implementation = ScoreDTO.class)))
+            })
     @PostMapping
     public ScoreDTO submitScore(@RequestBody ScoreDTO scoreDTO) {
         return scoreService.saveScore(scoreDTO);
@@ -51,21 +49,18 @@ public class ScoreController {
             summary = "Get top scores",
             description = "Retrieves the top scores, limited by the number provided.",
             parameters = {
-                    @Parameter(
-                            name = "limit",
-                            description = "Maximum number of scores to return",
-                            example = "10",
-                            required = true
-                    )
+                @Parameter(
+                        name = "limit",
+                        description = "Maximum number of scores to return",
+                        example = "10",
+                        required = true)
             },
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "List of top scores",
-                            content = @Content(schema = @Schema(implementation = ScoreDTO.class))
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "List of top scores",
+                        content = @Content(schema = @Schema(implementation = ScoreDTO.class)))
+            })
     @GetMapping("/top/{limit}")
     public List<ScoreDTO> getTopScores(@PathVariable int limit) {
         return scoreService.getTopScores(limit);

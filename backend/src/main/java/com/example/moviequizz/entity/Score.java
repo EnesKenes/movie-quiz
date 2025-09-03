@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -40,5 +39,4 @@ public class Score {
     public void prePersist() {
         setCreateTime(LocalDateTime.now());
     }
-
 }
