@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Film, Trophy, Play } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Film, Play, Trophy} from 'lucide-react';
+import {toast} from '@/hooks/use-toast';
 
 const LandingPage = () => {
   const [username, setUsername] = useState('');
@@ -19,7 +19,7 @@ const LandingPage = () => {
       });
       return;
     }
-    
+
     if (username.length > 20) {
       toast({
         title: "Username Too Long",
@@ -28,7 +28,7 @@ const LandingPage = () => {
       });
       return;
     }
-    
+
     // Store username in sessionStorage for use during the game
     sessionStorage.setItem('movieQuizUsername', username);
     navigate('/quiz');
@@ -44,7 +44,7 @@ const LandingPage = () => {
         <Card className="glass-card cinema-glow">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <Film className="h-16 w-16 text-primary animate-bounce-in" />
+              <Film className="h-16 w-16 text-primary animate-bounce-in"/>
             </div>
             <CardTitle className="text-4xl font-bold bg-gradient-cinema bg-clip-text text-transparent">
               Movie Quiz
@@ -53,7 +53,7 @@ const LandingPage = () => {
               Test your knowledge of cinema!
             </p>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             <div className="space-y-3">
               <label htmlFor="username" className="text-sm font-medium text-foreground">
@@ -73,24 +73,24 @@ const LandingPage = () => {
                 {username.length}/20 characters
               </p>
             </div>
-            
+
             <div className="space-y-3">
-              <Button 
+              <Button
                 onClick={handleStartQuiz}
                 className="w-full h-12 text-lg font-semibold"
                 size="lg"
               >
-                <Play className="mr-2 h-5 w-5" />
+                <Play className="mr-2 h-5 w-5"/>
                 Start Quiz
               </Button>
-              
-              <Button 
+
+              <Button
                 onClick={handleViewHighScores}
                 variant="outline"
                 className="w-full h-12 text-lg"
                 size="lg"
               >
-                <Trophy className="mr-2 h-5 w-5" />
+                <Trophy className="mr-2 h-5 w-5"/>
                 View High Scores
               </Button>
             </div>

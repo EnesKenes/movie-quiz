@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import {useEffect, useState} from "react"
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
@@ -47,12 +47,12 @@ export const reducer = (state, action) => {
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
+          t.id === action.toast.id ? {...t, ...action.toast} : t
         ),
       }
 
     case "DISMISS_TOAST": {
-      const { toastId } = action
+      const {toastId} = action
 
       // ! Side effects ! - This could be extracted into a dismissToast() action,
       // but I'll keep it here for simplicity
@@ -69,9 +69,9 @@ export const reducer = (state, action) => {
         toasts: state.toasts.map((t) =>
           t.id === toastId || toastId === undefined
             ? {
-                ...t,
-                open: false,
-              }
+              ...t,
+              open: false,
+            }
             : t
         ),
       }
@@ -92,7 +92,7 @@ export const reducer = (state, action) => {
 
 const listeners = []
 
-let memoryState = { toasts: [] }
+let memoryState = {toasts: []}
 
 function dispatch(action) {
   memoryState = reducer(memoryState, action)
@@ -101,15 +101,15 @@ function dispatch(action) {
   })
 }
 
-function toast({ ...props }) {
+function toast({...props}) {
   const id = genId()
 
   const update = (props) =>
     dispatch({
       type: "UPDATE_TOAST",
-      toast: { ...props, id },
+      toast: {...props, id},
     })
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
+  const dismiss = () => dispatch({type: "DISMISS_TOAST", toastId: id})
 
   dispatch({
     type: "ADD_TOAST",
@@ -146,8 +146,8 @@ function useToast() {
   return {
     ...state,
     toast,
-    dismiss: (toastId) => dispatch({ type: "DISMISS_TOAST", toastId }),
+    dismiss: (toastId) => dispatch({type: "DISMISS_TOAST", toastId}),
   }
 }
 
-export { useToast, toast }
+export {useToast, toast}

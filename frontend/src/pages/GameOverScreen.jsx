@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Trophy, Play, Loader2, Star } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { submitScore } from '@/services/api';
+import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Button} from '@/components/ui/button';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Badge} from '@/components/ui/badge';
+import {Loader2, Play, Star, Trophy} from 'lucide-react';
+import {toast} from '@/hooks/use-toast';
+import {submitScore} from '@/services/api';
 
 const GameOverScreen = () => {
   const [submitting, setSubmitting] = useState(false);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
   const navigate = useNavigate();
-  
+
   const username = sessionStorage.getItem('movieQuizUsername');
   const finalScore = parseInt(sessionStorage.getItem('movieQuizFinalScore') || '0');
 
@@ -20,22 +20,22 @@ const GameOverScreen = () => {
       navigate('/');
       return;
     }
-    
+
     // Auto-submit score when component mounts
     handleSubmitScore();
   }, [username, navigate]);
 
   const handleSubmitScore = async () => {
     if (scoreSubmitted || submitting) return;
-    
+
     setSubmitting(true);
-    
+
     try {
       await submitScore({
         username: username,
         score: finalScore
       });
-      
+
       setScoreSubmitted(true);
       toast({
         title: "Score Saved! 🎉",
@@ -93,7 +93,7 @@ const GameOverScreen = () => {
         <Card className="glass-card cinema-glow">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <Trophy className={`h-20 w-20 ${getScoreColor(finalScore)} animate-bounce-in`} />
+              <Trophy className={`h-20 w-20 ${getScoreColor(finalScore)} animate-bounce-in`}/>
             </div>
             <CardTitle className="text-3xl font-bold">
               Game Over!
@@ -102,12 +102,12 @@ const GameOverScreen = () => {
               Thanks for playing, <span className="text-foreground font-semibold">{username}</span>!
             </p>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             {/* Final Score Display */}
             <div className="text-center space-y-3">
               <Badge variant="secondary" className="text-2xl px-6 py-3">
-                <Star className="mr-2 h-6 w-6" />
+                <Star className="mr-2 h-6 w-6"/>
                 Final Score: {finalScore}
               </Badge>
               <p className={`text-lg font-medium ${getScoreColor(finalScore)}`}>
@@ -118,39 +118,39 @@ const GameOverScreen = () => {
             {/* Score Submission Status */}
             {submitting && (
               <div className="text-center space-y-2">
-                <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
+                <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto"/>
                 <p className="text-sm text-muted-foreground">Saving your score...</p>
               </div>
             )}
-            
+
             {scoreSubmitted && (
               <div className="text-center">
                 <p className="text-sm text-green-400">✓ Score saved to leaderboard!</p>
               </div>
             )}
-            
+
             {/* Action Buttons */}
             <div className="space-y-3">
-              <Button 
+              <Button
                 onClick={handlePlayAgain}
                 className="w-full h-12 text-lg font-semibold"
                 size="lg"
               >
-                <Play className="mr-2 h-5 w-5" />
+                <Play className="mr-2 h-5 w-5"/>
                 Play Again
               </Button>
-              
-              <Button 
+
+              <Button
                 onClick={handleViewHighScores}
                 variant="outline"
                 className="w-full h-12 text-lg"
                 size="lg"
               >
-                <Trophy className="mr-2 h-5 w-5" />
+                <Trophy className="mr-2 h-5 w-5"/>
                 View High Scores
               </Button>
-              
-              <Button 
+
+              <Button
                 onClick={handleBackToHome}
                 variant="ghost"
                 className="w-full h-10 text-base"

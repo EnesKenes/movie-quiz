@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Star, Timer } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { getQuestion, submitAnswer } from '@/services/api';
+import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Button} from '@/components/ui/button';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Badge} from '@/components/ui/badge';
+import {Loader2, Star, Timer} from 'lucide-react';
+import {toast} from '@/hooks/use-toast';
+import {getQuestion, submitAnswer} from '@/services/api';
 
 const QuizScreen = () => {
   const [question, setQuestion] = useState(null);
@@ -115,7 +115,7 @@ const QuizScreen = () => {
         <Card className="glass-card max-w-2xl w-full">
           <CardContent className="flex items-center justify-center py-16">
             <div className="text-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto"/>
               <p className="text-lg text-muted-foreground">Loading question...</p>
             </div>
           </CardContent>
@@ -145,11 +145,11 @@ const QuizScreen = () => {
         {/* Score and Type Header */}
         <div className="flex justify-between items-center">
           <Badge variant="secondary" className="text-lg px-4 py-2">
-            <Star className="mr-2 h-4 w-4" />
+            <Star className="mr-2 h-4 w-4"/>
             Score: {score}
           </Badge>
           <Badge variant="outline" className="text-lg px-4 py-2">
-            <Timer className="mr-2 h-4 w-4" />
+            <Timer className="mr-2 h-4 w-4"/>
             {question.type}
           </Badge>
         </div>
@@ -186,7 +186,7 @@ const QuizScreen = () => {
                   size="lg"
                 >
                   {submitting && selectedAnswer === option ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
                   ) : null}
                   {option}
                 </Button>
