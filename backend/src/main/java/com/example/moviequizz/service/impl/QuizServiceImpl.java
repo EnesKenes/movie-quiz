@@ -6,8 +6,8 @@ import com.example.moviequizz.dto.QuestionDTO;
 import com.example.moviequizz.dto.QuestionType;
 import com.example.moviequizz.entity.Movie;
 import com.example.moviequizz.repository.MovieRepository;
-import com.example.moviequizz.util.JwtUtil;
 import com.example.moviequizz.service.QuizService;
+import com.example.moviequizz.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +75,13 @@ public class QuizServiceImpl implements QuizService {
 
         String token = jwtUtil.generateQuestionToken(imdbID, type, 10 * 60 * 1000);
 
-        return new QuestionDTO(questionText, options, token, type);
+        return QuestionDTO.builder()
+                .questionText(questionText)
+                .options(options)
+                .token(token)
+                .type(type)
+                .imageUrl(movie.getImageUrl())
+                .build();
     }
 
     private String pickRandomFromCsv(String csv) {
@@ -138,11 +144,19 @@ public class QuizServiceImpl implements QuizService {
         String questionId = jwtUtil.extractQuestionId(answerDTO.getToken());
 
         if (jwtUtil.isTokenExpired(answerDTO.getToken())) {
-            return new AnswerResultDTO(false, null);
+            return AnswerResultDTO.builder()
+                    .correct(false)
+                    .nextQuestion(null)
+                    .build();
         }
 
         Optional<Movie> movieOpt = movieRepository.findByImdbId(questionId);
-        if (movieOpt.isEmpty()) return new AnswerResultDTO(false, null);
+        if (movieOpt.isEmpty()) {
+            return AnswerResultDTO.builder()
+                    .correct(false)
+                    .nextQuestion(null)
+                    .build();
+        }
 
         Movie movie = movieOpt.get();
         QuestionType type = jwtUtil.extractQuestionType(answerDTO.getToken());
@@ -164,13 +178,24 @@ public class QuizServiceImpl implements QuizService {
                         .equalsIgnoreCase(answerDTO.getSelectedAnswer().trim());
                 break;
             default:
-                return new AnswerResultDTO(false, null);
+                return AnswerResultDTO.builder()
+                        .correct(false)
+                        .nextQuestion(null)
+                        .build();
         }
 
-        if (!correct) return new AnswerResultDTO(false, null);
+        if (!correct) {
+            return AnswerResultDTO.builder()
+                    .correct(false)
+                    .nextQuestion(null)
+                    .build();
+        }
 
         QuestionDTO nextQuestion = generateQuestion();
-        return new AnswerResultDTO(true, nextQuestion);
+        return AnswerResultDTO.builder()
+                .correct(true)
+                .nextQuestion(nextQuestion)
+                .build();
     }
 
     /**

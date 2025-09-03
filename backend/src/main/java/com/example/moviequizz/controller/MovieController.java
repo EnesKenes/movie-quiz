@@ -5,6 +5,12 @@ import com.example.moviequizz.entity.Movie;
 import com.example.moviequizz.repository.MovieRepository;
 import com.example.moviequizz.service.OmdbService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Movie Management API", description = "Endpoint for importing top movies from OMDB")
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
@@ -28,9 +35,30 @@ public class MovieController {
         this.objectMapper = objectMapper;
     }
 
-    /**
-     * Bulk populate movies from a JSON file.
-     */
+    @Operation(
+            summary = "Import IMDb Top Movies",
+            description = "Imports movies from a local `top250_min.json` file and enriches them with details from the OMDb API. "
+                    + "Movies are saved into the database only if they don't already exist. "
+                    + "This operation is **restricted to admin users only**.",
+            security = { @SecurityRequirement(name = "bearerAuth") },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Movies imported successfully",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid file or parsing error",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Unexpected server error",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    )
+            }
+    )
     @PostMapping("/import-top")
     public String importTopMovies() {
         try {
