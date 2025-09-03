@@ -1,6 +1,8 @@
-package com.example.moviequizz.service;
+package com.example.moviequizz.service.impl;
 
 import java.util.Map;
+
+import com.example.moviequizz.service.OmdbService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
