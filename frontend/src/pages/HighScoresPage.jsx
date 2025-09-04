@@ -76,7 +76,7 @@ const HighScoresPage = () => {
         <Card className="glass-card cinema-glow">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <Trophy className="h-16 w-16 text-primary animate-bounce-in"/>
+              <Trophy className="h-16 w-16 text-blue-700 animate-bounce-in"/>
             </div>
             <CardTitle className="text-3xl font-bold bg-gradient-cinema bg-clip-text text-transparent">
               High Scores

@@ -42,9 +42,9 @@ const LandingPage = () => {
     <div className="quiz-container">
       <div className="max-w-md w-full animate-fade-in">
         <Card className="glass-card cinema-glow">
-          <CardHeader className="text-center space-y-4">
+          <CardHeader className="text-center space-y-">
             <div className="flex justify-center">
-              <Film className="h-16 w-16 text-primary animate-bounce-in"/>
+              <Film className="h-16 w-16 text-blue-700 animate-bounce-in"/>
             </div>
             <CardTitle className="text-4xl font-bold bg-gradient-cinema bg-clip-text text-transparent">
               Movie Quiz
