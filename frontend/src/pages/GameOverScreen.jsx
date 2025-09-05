@@ -5,7 +5,8 @@ import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {Loader2, Play, Star, Trophy} from 'lucide-react';
 import {toast} from '@/hooks/use-toast';
-import {submitScore} from '@/services/api';
+import {startNewGame} from '@/services/api';
+import {getTopScores} from '@/services/api';
 
 const GameOverScreen = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -21,36 +22,10 @@ const GameOverScreen = () => {
       return;
     }
 
-    // Auto-submit score when component mounts
-    handleSubmitScore();
+    // No direct score submission endpoint anymore. We just mark the game as finished.
+    // Optionally, you could trigger fetching top scores after game ends.
+    setScoreSubmitted(true); // assume backend stores it automatically via QuizService
   }, [username, navigate]);
-
-  const handleSubmitScore = async () => {
-    if (scoreSubmitted || submitting) return;
-
-    setSubmitting(true);
-
-    try {
-      await submitScore({
-        username: username,
-        score: finalScore
-      });
-
-      setScoreSubmitted(true);
-      toast({
-        title: "Score Saved! 🎉",
-        description: "Your score has been added to the leaderboard.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save score. You can still view the leaderboard.",
-        variant: "destructive"
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handlePlayAgain = () => {
     // Clear the final score but keep the username
@@ -114,14 +89,6 @@ const GameOverScreen = () => {
                 {getScoreMessage(finalScore)}
               </p>
             </div>
-
-            {/* Score Submission Status */}
-            {submitting && (
-              <div className="text-center space-y-2">
-                <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto"/>
-                <p className="text-sm text-muted-foreground">Saving your score...</p>
-              </div>
-            )}
 
             {scoreSubmitted && (
               <div className="text-center">

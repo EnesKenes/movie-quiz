@@ -26,7 +26,7 @@ public class GameSession {
     private String username;
 
     @Column(nullable = false, unique = true)
-    private String sessionId; // UUID stored as String
+    private UUID gameId; // UUID stored as String
 
     @Column(nullable = false)
     private int score = 0;
@@ -38,7 +38,7 @@ public class GameSession {
 
     public GameSession(String username) {
         this.username = username;
-        this.sessionId = UUID.randomUUID().toString();
+        this.gameId = UUID.randomUUID();
         this.score = 0;
         this.finished = false;
     }

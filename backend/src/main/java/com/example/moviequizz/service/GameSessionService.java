@@ -1,17 +1,18 @@
 package com.example.moviequizz.service;
 
 import com.example.moviequizz.dto.GameSessionDTO;
-import com.example.moviequizz.entity.GameSession;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface GameSessionService {
 
     GameSessionDTO startGame(String username);
 
-    GameSessionDTO updateScore(String sessionId, int newScore);
+    GameSessionDTO updateScore(UUID gameId, int newScore);
 
-    GameSessionDTO finishGame(String sessionId);
+    GameSessionDTO finishGame(UUID gameId);
 
     List<GameSessionDTO> getTopScores(int limit);
 

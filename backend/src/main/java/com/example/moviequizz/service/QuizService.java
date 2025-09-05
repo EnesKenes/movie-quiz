@@ -7,9 +7,10 @@ import com.example.moviequizz.dto.QuestionType;
 
 public interface QuizService {
 
-    QuestionDTO generateQuestion();
+    QuestionDTO startNewGame(String username);
 
     QuestionDTO generateQuestion(QuestionType type);
 
     AnswerResultDTO submitAnswer(AnswerDTO answerDTO);
+
 }

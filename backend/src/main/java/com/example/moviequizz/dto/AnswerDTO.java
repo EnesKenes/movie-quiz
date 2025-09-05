@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,8 @@ public class AnswerDTO {
                     "The token identifying the question (usually a JWT containing the IMDb ID)",
             example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0dDAwMTIzNDUifQ.sometokenvalue")
     private String token;
+
+    @Schema(description = "Unique identifier of the game session")
+    private UUID gameId;
+
 }

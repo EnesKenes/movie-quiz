@@ -2,6 +2,8 @@ package com.example.moviequizz.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,4 +40,8 @@ public class QuestionDTO {
             description = "URL of an image related to the question (e.g., movie poster)",
             example = "https://example.com/images/inception.jpg")
     private String imageUrl;
+
+    @Schema(description = "Unique identifier of the game session")
+    private UUID gameId;
+
 }

@@ -24,9 +24,11 @@ const apiFetch = async (url, options = {}) => {
   }
 };
 
-// Get a new quiz question
-export const getQuestion = async () => {
-  return await apiFetch('/quiz/question');
+// Start a new game
+export const startNewGame = async (username) => {
+  return await apiFetch(`/quiz/start?username=${encodeURIComponent(username)}`, {
+    method: 'POST',
+  });
 };
 
 // Submit an answer for validation
@@ -37,15 +39,7 @@ export const submitAnswer = async (answerData) => {
   });
 };
 
-// Submit a player's final score
-export const submitScore = async (scoreData) => {
-  return await apiFetch('/scores', {
-    method: 'POST',
-    body: JSON.stringify(scoreData),
-  });
-};
-
 // Get top scores from the leaderboard
 export const getTopScores = async (limit = 10) => {
-  return await apiFetch(`/scores/top/${limit}`);
+  return await apiFetch(`/sessions/top/${limit}`);
 };

@@ -1,11 +1,11 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {Badge} from '@/components/ui/badge';
-import {Loader2, Star, Timer} from 'lucide-react';
-import {toast} from '@/hooks/use-toast';
-import {getQuestion, submitAnswer} from '@/services/api';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, Star, Timer } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { startNewGame, submitAnswer } from '@/services/api';
 
 const QuizScreen = () => {
   const [question, setQuestion] = useState(null);
@@ -26,27 +26,31 @@ const QuizScreen = () => {
     // Load persisted question if exists
     const savedQuestion = sessionStorage.getItem('currentQuestion');
     if (savedQuestion) {
-      setQuestion(JSON.parse(savedQuestion));
+      const questionData = JSON.parse(savedQuestion);
+      setQuestion(questionData);
       setLoading(false);
+      // ensure gameId is stored
+      if (questionData.gameId) {
+        sessionStorage.setItem('currentGameId', questionData.gameId);
+      }
     } else {
-      loadQuestion();
+      startGame();
     }
   }, [username, navigate]);
 
-  const loadQuestion = async () => {
+  const startGame = async () => {
     try {
       setLoading(true);
-      const questionData = await getQuestion();
-      setQuestion(questionData);
+      const firstQuestion = await startNewGame(username);
+      setQuestion(firstQuestion);
       setSelectedAnswer(null);
-
-      // Persist current question
-      sessionStorage.setItem('currentQuestion', JSON.stringify(questionData));
+      sessionStorage.setItem('currentQuestion', JSON.stringify(firstQuestion));
+      sessionStorage.setItem('currentGameId', firstQuestion.gameId);
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to load question. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to start new game. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -62,7 +66,8 @@ const QuizScreen = () => {
     try {
       const result = await submitAnswer({
         selectedAnswer: answer,
-        token: question.token
+        token: question.token,
+        gameId: sessionStorage.getItem('currentGameId'),
       });
 
       if (result.correct) {
@@ -70,29 +75,31 @@ const QuizScreen = () => {
         setScore(newScore);
 
         toast({
-          title: "Correct! 🎉",
-          description: "Great job! Loading next question...",
+          title: 'Correct! 🎉',
+          description: 'Great job! Loading next question...',
         });
 
         setTimeout(() => {
           if (result.nextQuestion) {
             setQuestion(result.nextQuestion);
             sessionStorage.setItem('currentQuestion', JSON.stringify(result.nextQuestion));
+            sessionStorage.setItem('currentGameId', result.nextQuestion.gameId);
             setSelectedAnswer(null);
             setSubmitting(false);
           } else {
-            loadQuestion();
+            startGame(); // fallback if nextQuestion is missing
             setSubmitting(false);
           }
         }, 1500);
       } else {
         // Wrong answer - game over
         sessionStorage.setItem('movieQuizFinalScore', score.toString());
-        sessionStorage.removeItem('currentQuestion'); // remove persisted question
+        sessionStorage.removeItem('currentQuestion');
+        sessionStorage.removeItem('currentGameId');
         toast({
-          title: "Incorrect! ❌",
-          description: "Game over! Redirecting to results...",
-          variant: "destructive"
+          title: 'Incorrect! ❌',
+          description: 'Game over! Redirecting to results...',
+          variant: 'destructive',
         });
 
         setTimeout(() => {
@@ -101,9 +108,9 @@ const QuizScreen = () => {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to submit answer. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to submit answer. Please try again.',
+        variant: 'destructive',
       });
       setSubmitting(false);
     }
@@ -115,7 +122,7 @@ const QuizScreen = () => {
         <Card className="glass-card max-w-2xl w-full">
           <CardContent className="flex items-center justify-center py-16">
             <div className="text-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto"/>
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
               <p className="text-lg text-muted-foreground">Loading question...</p>
             </div>
           </CardContent>
@@ -130,7 +137,7 @@ const QuizScreen = () => {
         <Card className="glass-card max-w-2xl w-full">
           <CardContent className="text-center py-16">
             <p className="text-lg text-muted-foreground">Failed to load question</p>
-            <Button onClick={loadQuestion} className="mt-4">
+            <Button onClick={startGame} className="mt-4">
               Try Again
             </Button>
           </CardContent>
@@ -145,11 +152,11 @@ const QuizScreen = () => {
         {/* Score and Type Header */}
         <div className="flex justify-between items-center">
           <Badge variant="secondary" className="text-lg px-4 py-2">
-            <Star className="mr-2 h-4 w-4"/>
+            <Star className="mr-2 h-4 w-4" />
             Score: {score}
           </Badge>
           <Badge variant="outline" className="text-lg px-4 py-2">
-            <Timer className="mr-2 h-4 w-4"/>
+            <Timer className="mr-2 h-4 w-4" />
             {question.type}
           </Badge>
         </div>
@@ -181,12 +188,12 @@ const QuizScreen = () => {
                   key={index}
                   onClick={() => handleAnswerSelect(option)}
                   disabled={submitting}
-                  variant={selectedAnswer === option ? "default" : "outline"}
+                  variant={selectedAnswer === option ? 'default' : 'outline'}
                   className="h-16 text-lg font-medium transition-all duration-200 hover:scale-105"
                   size="lg"
                 >
                   {submitting && selectedAnswer === option ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   ) : null}
                   {option}
                 </Button>

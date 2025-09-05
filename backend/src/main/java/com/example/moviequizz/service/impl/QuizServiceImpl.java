@@ -4,28 +4,56 @@ import com.example.moviequizz.dto.AnswerDTO;
 import com.example.moviequizz.dto.AnswerResultDTO;
 import com.example.moviequizz.dto.QuestionDTO;
 import com.example.moviequizz.dto.QuestionType;
+import com.example.moviequizz.entity.GameSession;
 import com.example.moviequizz.entity.Movie;
+import com.example.moviequizz.repository.GameSessionRepository;
 import com.example.moviequizz.repository.MovieRepository;
 import com.example.moviequizz.service.QuizService;
 import com.example.moviequizz.util.JwtUtil;
-import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class QuizServiceImpl implements QuizService {
 
     private final MovieRepository movieRepository;
+    private final GameSessionRepository gameSessionRepository;
     private final JwtUtil jwtUtil;
     private final Random random = new Random();
 
     @Autowired
-    public QuizServiceImpl(MovieRepository movieRepository, JwtUtil jwtUtil) {
+    public QuizServiceImpl(
+            MovieRepository movieRepository,
+            GameSessionRepository gameSessionRepository,
+            JwtUtil jwtUtil
+    ) {
         this.movieRepository = movieRepository;
+        this.gameSessionRepository = gameSessionRepository;
         this.jwtUtil = jwtUtil;
     }
 
     @Override
+    public QuestionDTO startNewGame(String username) {
+        // create new game session
+        GameSession session = GameSession.builder()
+                .gameId(UUID.randomUUID())
+                .username(username)
+                .score(0)
+                .finished(false)
+                .finishedAt(null)
+                .build();
+
+        gameSessionRepository.save(session);
+
+        // return first question with gameId included
+        QuestionDTO question = generateQuestion(null);
+        question.setGameId(session.getGameId());
+        return question;
+    }
+
     public QuestionDTO generateQuestion() {
         return generateQuestion(null);
     }
@@ -90,22 +118,15 @@ public class QuizServiceImpl implements QuizService {
 
     private List<String> generateRandomOptions(
             String correctAnswer, QuestionType type, List<Movie> movies, Movie correctMovie) {
+
         Set<String> wrongOptions = new HashSet<>();
         Set<String> excluded = new HashSet<>();
 
         switch (type) {
-            case DIRECTOR:
-                excluded.addAll(Arrays.asList(correctMovie.getDirectorsCsv().split(",\\s*")));
-                break;
-            case ACTOR:
-                excluded.addAll(Arrays.asList(correctMovie.getActorsCsv().split(",\\s*")));
-                break;
-            case GENRE:
-                excluded.addAll(Arrays.asList(correctMovie.getGenresCsv().split(",\\s*")));
-                break;
-            case YEAR:
-                excluded.add(String.valueOf(correctMovie.getYear()));
-                break;
+            case DIRECTOR -> excluded.addAll(Arrays.asList(correctMovie.getDirectorsCsv().split(",\\s*")));
+            case ACTOR -> excluded.addAll(Arrays.asList(correctMovie.getActorsCsv().split(",\\s*")));
+            case GENRE -> excluded.addAll(Arrays.asList(correctMovie.getGenresCsv().split(",\\s*")));
+            case YEAR -> excluded.add(String.valueOf(correctMovie.getYear()));
         }
 
         while (wrongOptions.size() < 3) {
@@ -113,20 +134,13 @@ public class QuizServiceImpl implements QuizService {
             String option;
 
             switch (type) {
-                case DIRECTOR:
-                    option = pickRandomFromCsv(randomMovie.getDirectorsCsv());
-                    break;
-                case ACTOR:
-                    option = pickRandomFromCsv(randomMovie.getActorsCsv());
-                    break;
-                case GENRE:
-                    option = pickRandomFromCsv(randomMovie.getGenresCsv());
-                    break;
-                case YEAR:
-                    option = String.valueOf(randomMovie.getYear());
-                    break;
-                default:
+                case DIRECTOR -> option = pickRandomFromCsv(randomMovie.getDirectorsCsv());
+                case ACTOR -> option = pickRandomFromCsv(randomMovie.getActorsCsv());
+                case GENRE -> option = pickRandomFromCsv(randomMovie.getGenresCsv());
+                case YEAR -> option = String.valueOf(randomMovie.getYear());
+                default -> {
                     continue;
+                }
             }
 
             if (!excluded.contains(option)) {
@@ -158,29 +172,45 @@ public class QuizServiceImpl implements QuizService {
         boolean correct;
 
         switch (type) {
-            case DIRECTOR:
-                correct = containsCsvValue(movie.getDirectorsCsv(), answerDTO.getSelectedAnswer());
-                break;
-            case ACTOR:
-                correct = containsCsvValue(movie.getActorsCsv(), answerDTO.getSelectedAnswer());
-                break;
-            case GENRE:
-                correct = containsCsvValue(movie.getGenresCsv(), answerDTO.getSelectedAnswer());
-                break;
-            case YEAR:
-                correct =
-                        String.valueOf(movie.getYear())
-                                .equalsIgnoreCase(answerDTO.getSelectedAnswer().trim());
-                break;
-            default:
+            case DIRECTOR ->
+                    correct = containsCsvValue(movie.getDirectorsCsv(), answerDTO.getSelectedAnswer());
+            case ACTOR ->
+                    correct = containsCsvValue(movie.getActorsCsv(), answerDTO.getSelectedAnswer());
+            case GENRE ->
+                    correct = containsCsvValue(movie.getGenresCsv(), answerDTO.getSelectedAnswer());
+            case YEAR ->
+                    correct = String.valueOf(movie.getYear())
+                            .equalsIgnoreCase(answerDTO.getSelectedAnswer().trim());
+            default -> {
                 return AnswerResultDTO.builder().correct(false).nextQuestion(null).build();
+            }
         }
 
-        if (!correct) {
+        // fetch game session by gameId
+        UUID gameId = answerDTO.getGameId();
+        Optional<GameSession> sessionOpt = gameSessionRepository.findByGameId(gameId);
+        if (sessionOpt.isEmpty()) {
             return AnswerResultDTO.builder().correct(false).nextQuestion(null).build();
         }
 
+        GameSession session = sessionOpt.get();
+
+        if (!correct) {
+            // mark game finished
+            session.setFinished(true);
+            session.setFinishedAt(LocalDateTime.now());
+            gameSessionRepository.save(session);
+
+            return AnswerResultDTO.builder().correct(false).nextQuestion(null).build();
+        }
+
+        // correct answer -> increase score
+        session.setScore(session.getScore() + 1);
+        gameSessionRepository.save(session);
+
         QuestionDTO nextQuestion = generateQuestion();
+        nextQuestion.setGameId(session.getGameId());
+
         return AnswerResultDTO.builder().correct(true).nextQuestion(nextQuestion).build();
     }
 

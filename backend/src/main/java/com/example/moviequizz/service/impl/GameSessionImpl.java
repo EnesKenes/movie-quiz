@@ -6,10 +6,12 @@ import com.example.moviequizz.mapper.GameSessionMapper;
 import com.example.moviequizz.repository.GameSessionRepository;
 import com.example.moviequizz.service.GameSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class GameSessionImpl implements GameSessionService {
@@ -23,33 +25,43 @@ public class GameSessionImpl implements GameSessionService {
         this.gameSessionMapper = gameSessionMapper;
     }
 
+    @Override
     public GameSessionDTO startGame(String username) {
-        GameSession session = new GameSession(username);
+        GameSession session = GameSession.builder()
+                .gameId(UUID.randomUUID())
+                .username(username)
+                .score(0)
+                .finished(false)
+                .finishedAt(null)
+                .build();
+
         return gameSessionMapper.toDTO(gameSessionRepository.save(session));
     }
 
-    public GameSessionDTO updateScore(String sessionId, int newScore) {
-        GameSession session = gameSessionRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid sessionId"));
+    @Override
+    public GameSessionDTO updateScore(UUID gameId, int newScore) {
+        GameSession session = gameSessionRepository.findByGameId(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid gameId"));
+
         session.setScore(newScore);
         return gameSessionMapper.toDTO(gameSessionRepository.save(session));
     }
 
-    public GameSessionDTO finishGame(String sessionId) {
-        GameSession session = gameSessionRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid sessionId"));
+    @Override
+    public GameSessionDTO finishGame(UUID gameId) {
+        GameSession session = gameSessionRepository.findByGameId(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid gameId"));
+
         session.setFinished(true);
         session.setFinishedAt(LocalDateTime.now());
         return gameSessionMapper.toDTO(gameSessionRepository.save(session));
     }
 
+    @Override
     public List<GameSessionDTO> getTopScores(int limit) {
-        return gameSessionRepository.findAll().stream()
-                .filter(GameSession::isFinished)
-                .sorted((a, b) -> Integer.compare(b.getScore(), a.getScore()))
-                .limit(limit)
+        List<GameSession> sessions = gameSessionRepository.findTopFinishedSessions(PageRequest.of(0, limit));
+        return sessions.stream()
                 .map(gameSessionMapper::toDTO)
                 .toList();
     }
-
 }
