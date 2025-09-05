@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class MovieServiceImpl implements MovieService {
     private final MovieRepository movieRepository;
     private final ObjectMapper objectMapper;
 
+    @Autowired
     public MovieServiceImpl(
             OmdbService omdbService, MovieRepository movieRepository, ObjectMapper objectMapper) {
         this.omdbService = omdbService;
