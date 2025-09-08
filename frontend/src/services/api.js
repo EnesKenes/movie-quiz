@@ -1,6 +1,7 @@
 // API service for Movie Quiz backend communication
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://192.168.1.24:8080/api';
+const USE_GEMINI = import.meta.env.VITE_USE_GEMINI === 'true';
 
 // Generic fetch wrapper with error handling
 const apiFetch = async (url, options = {}) => {
@@ -24,16 +25,20 @@ const apiFetch = async (url, options = {}) => {
   }
 };
 
+// Fetch question based on USE_GEMINI
+
 // Start a new game
 export const startNewGame = async (username) => {
-  return await apiFetch(`/quiz/start?username=${encodeURIComponent(username)}`, {
+  const path = USE_GEMINI ? '/gemini-quiz/start' : '/quiz/start';
+  return await apiFetch(`${path}?username=${encodeURIComponent(username)}`, {
     method: 'POST',
   });
 };
 
-// Submit an answer for validation
+// Submit an answer
 export const submitAnswer = async (answerData) => {
-  return await apiFetch('/quiz/answer', {
+  const path = USE_GEMINI ? '/gemini-quiz/answer' : '/quiz/answer';
+  return await apiFetch(path, {
     method: 'POST',
     body: JSON.stringify(answerData),
   });
