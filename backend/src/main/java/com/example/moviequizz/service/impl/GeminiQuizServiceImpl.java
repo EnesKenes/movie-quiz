@@ -13,6 +13,7 @@ import com.example.moviequizz.util.JwtUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +30,9 @@ public class GeminiQuizServiceImpl implements GeminiQuizService {
     private final Random random = new Random();
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${gemini.api.key}")
+    private String geminiApiKey;
 
     @Autowired
     public GeminiQuizServiceImpl(
@@ -77,14 +81,12 @@ public class GeminiQuizServiceImpl implements GeminiQuizService {
 
     private QuestionDTO generateQuestionOfType(QuestionType type, List<Movie> movies) {
         try {
-            // 1. Get a random movie title from Gemini API
-            String geminiApiKey = System.getenv("GEMINI_API_KEY");
+
             String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
             String prompt = "{ \"contents\": [{ \"parts\": [{\"text\": \"Pick a random movie title that is not a " +
                     "blockbuster or a top-50 most famous movie. The movie can be from any genre and any decade." +
                     " Only give the title, and do not repeat titles you recently suggested.\"}]}]}";
-
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
